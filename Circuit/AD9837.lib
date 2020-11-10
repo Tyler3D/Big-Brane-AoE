@@ -1,0 +1,31 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#(c) SnapEDA 2016 (snapeda.com)
+#This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA) with Design Exception 1.0
+#
+# AD9837
+#
+DEF AD9837 U 0 40 N Y 1 L N
+F0 "U" -500 330 50 H V L BNN
+F1 "AD9837" -500 -400 50 H V L BNN
+F2 "AD9837" 0 0 50 H I L BNN
+F3 "" 0 0 50 H I L BNN
+F4 "IC-11223" 0 0 50 H I L BNN "PROD_ID"
+F5 "AD9837BCPZ" 0 0 50 H I L BNN "VALUE"
+DRAW
+S -500 -300 500 300 0 0 10 f
+X SCLK P$7 -700 200 200 R 40 40 0 0 B 
+X SDATA P$6 -700 100 200 R 40 40 0 0 B 
+X FSYNC P$8 -700 0 200 R 40 40 0 0 B 
+X MCLK P$5 -700 -100 200 R 40 40 0 0 B 
+X DGND P$0 -700 -200 200 R 40 40 0 0 B 
+X DGND P$4 -700 -200 200 R 40 40 0 0 B 
+X AGND P$9 700 -100 200 L 40 40 0 0 B 
+X VOUT P$10 700 0 200 L 40 40 0 0 B 
+X COMP P$1 700 100 200 L 40 40 0 0 B 
+X VDD P$2 700 200 200 L 40 40 0 0 B 
+X CAP/2.5V P$3 700 -200 200 L 40 40 0 0 B 
+ENDDRAW
+ENDDEF
+#
+# End Library
