@@ -13,7 +13,7 @@ class Audio {
   }
   void playTone(uint8_t tone) 
   {
-    std::cout << "Playing tone " << tone << std::endl;
+    std::cout << "Playing tone " << unsigned(tone) << std::endl;
   }
   void mute() 
   {
@@ -30,7 +30,8 @@ class Buttons {
   {
     std::cout << "Buttons initialized" << std::endl;
   }
-  uint8_t scanButtons() {
+  uint8_t scanButtons() 
+  {
   	/* For now, works on user input
     timesPressed++;
     if (timesPressed <= 10)
@@ -42,7 +43,8 @@ class Buttons {
     }
     */
   	std::cin >> userInput;
-  	return userInput;
+  	return userInput - 0x30; // Since std::cin returns a char, we need to convert from ASCII
+  	// return userInput;
   }
 };
 
@@ -77,9 +79,9 @@ class LEDs {
 class SDCard { 
   private:
   // Allocate space for 512 individual notes.
-  uint8_t song[256]; 
+  uint8_t song[256] = {1, 1, 5, 5, 6, 6, 5, 7, 4, 4, 3, 3, 2, 2, 1, 9, 4, 5, 5, 5, 0, 0, 0, 0xff};
+  uint8_t index = 0;
   public:
-  uint8_t temp = 0;
   SDCard()
   {
     std::cout << "SDCard initialized" << std::endl;
@@ -87,15 +89,12 @@ class SDCard {
 
   void openSong(uint8_t songNo)
   {
-    
+  	index = 0;
   }
   
   uint8_t nextTone()
   {
-  	if (temp == 10)
-    	temp = 0;
-    temp++;
-    return temp;
+  	return song[index++];
   }
 };
 
@@ -118,13 +117,18 @@ class Piano {
         ledState[i] = ledState[i + 1];
         leds.setLED(i, ledState[i] & TONE_MASK);
     }
-    ledState[3] = (1 << ENABLE_BIT) | nextTone;
+    ledState[3] = ((1 << ENABLE_BIT) | nextTone) & 0x7f;
     leds.setLED(3, nextTone);
   }
   
   void initialize()
   {
   	sdcard.openSong(songSelected);
+  	ledState[0] = 0;
+  	ledState[1] = 0;
+  	ledState[2] = 0;
+  	ledState[3] = 0;
+
     for (uint8_t i = 0; i < 3; i++)
     {
     	nextTone = sdcard.nextTone();
@@ -135,7 +139,7 @@ class Piano {
   
   Piano() 
   {
-    while (!songSelected)  
+    while (!songSelected)
     {
         songSelected = buttons.scanButtons();
     }
@@ -153,10 +157,10 @@ class Piano {
       while(true)
       {
       	nextTone = sdcard.nextTone();
-      	if (nextTone == 10) // Signifying end of song
+      	if (nextTone == 0xff) // Signifying end of song
       	{
-      		initialize();
       		std::cout << "Song is restarting... You Won!" << std::endl;
+      		initialize();
       		continue;
       	}
       	std::cout << unsigned(nextTone) << std::endl;
@@ -164,13 +168,12 @@ class Piano {
       	shiftLedsDown(nextTone);
       	// Loop is restarted if Buttons do not match leds
       	uint8_t user = buttons.scanButtons();
-      	std::cout << "Input received... " << user << " Which is supposed to equal " << unsigned(ledState[0]) << std::endl;
-      	
-      	if (user != unsigned(ledState[0]))
+      	std::cout << "Input received... " << unsigned(user) << " Which is supposed to equal " << unsigned(ledState[0]) << std::endl;
+      	if (user != (ledState[0]))
       	{
       		// Secondary LED turns on to show failure
-      		initialize();
       		std::cout << "Song is restarting... You Failed!" << std::endl;
+      		initialize();
       		continue;
       	}
 
