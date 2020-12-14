@@ -23,16 +23,17 @@ class Audio {
 
 class Buttons {
   private:
-  uint8_t song[256] = {1, 1, 5, 5, 6, 6, 5, 7, 4, 4, 3, 3, 2, 2, 1, 9, 4, 5, 5, 5, 0, 0, 0, 0xff};
-  uint8_t index = 0;
+  uint8_t song[0xff] = {4, 16, 1, 1, 5, 5, 6, 6, 5, 7, 4, 4, 3, 3, 2, 2, 1, 9, 4, 5, 5, 5, 0xff};
+  uint8_t index;
   public:
   Buttons()
   {
     Serial.print("Buttons initialized \n");
+    index = 0;
   }
   uint8_t scanButtons() // For now, cheat
   {
-    if (song[index] = 0xff)
+    if (song[index] == 0xff)
       index = 0;
     return song[index++];
   }
@@ -73,17 +74,20 @@ class LEDs {
 class SDCard { 
   private:
   // Allocate space for 512 individual notes.
-  uint8_t song[256] = {1, 1, 5, 5, 6, 6, 5, 7, 4, 4, 3, 3, 2, 2, 1, 9, 4, 5, 5, 5, 0, 0, 0, 0xff};
-  uint8_t index = 0;
+  uint8_t song[0xff] = {1, 1, 5, 5, 6, 6, 5, 7, 4, 4, 3, 3, 2, 2, 1, 9, 4, 5, 5, 5, 0, 0, 0, 0xff};
+  uint8_t index;
   public:
   SDCard()
   {
     Serial.print("SDCard initialized \n");
+    index = 0;
   }
 
   void openSong(uint8_t songNo)
   {
     index = 0;
+    Serial.print("Selecting song: ");
+    Serial.println(unsigned(songNo));
   }
   
   uint8_t nextTone()
@@ -118,7 +122,21 @@ class Piano {
   
   void initialize()
   {
+    //while (!songSelected)
+    //{
+        songSelected = buttons.scanButtons();
+    //}
+    //songSelected &= TONE_MASK; // Drop BP bit
+
+    //while (!difficulty)
+    //{
+      difficulty = buttons.scanButtons();
+    //}
+    
     sdcard.openSong(songSelected);
+    Serial.print("Setting difficulty to: ");
+    Serial.println(unsigned(difficulty));
+    
     ledState[0] = 0;
     ledState[1] = 0;
     ledState[2] = 0;
@@ -134,19 +152,7 @@ class Piano {
   
   Piano() 
   {
-    while (!songSelected)
-    {
-        songSelected = buttons.scanButtons();
-    }
-    songSelected &= TONE_MASK; // Drop BP bit
-
-    while (!difficulty)
-    {
-      difficulty = buttons.scanButtons();
-    }
-  
     initialize();
-
   }
 
   void next()
@@ -164,9 +170,12 @@ class Piano {
       shiftLedsDown(nextTone);
       // Loop is restarted if Buttons do not match leds
       uint8_t user = buttons.scanButtons();
+      Serial.print(unsigned(user));
+      Serial.print(" Is the user input. Is supposed to equal: ");
+      Serial.println(ledState[0]);
       if (user != (ledState[0]))
       {
-        // Secondary LED turns on to show failure
+        //Secondary LED turns on to show failure
         Serial.print("Song is restarting... You Failed! \n");
         initialize();
         return;
@@ -177,12 +186,14 @@ class Piano {
 
 };
 
-Piano piano;
 void setup() {
-  
+  Serial.begin(9600);
+  Piano piano;
+  while(true)
+    piano.next();
 }
 
 void loop()
 {
-  piano.next();
+  
 }
