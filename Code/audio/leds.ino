@@ -103,7 +103,7 @@ private:
     SPI.transfer(val);
     digitalWrite(MAX7219_SS, HIGH);
   }
-
+ 
   void writeDigit(uint8_t dig, uint8_t val) {
     digState[dig] = val;
     beginTransaction();
