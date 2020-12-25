@@ -8,15 +8,12 @@ class SDCard {
   public:
   SDCard()
   {
-    Serial.print("SDCard initialized \n");
     index = 0;
   }
 
   void openSong(uint8_t songNo)
   {
     index = 0;
-    Serial.print("Selecting song: ");
-    Serial.println(unsigned(songNo));
   }
   
   uint8_t nextTone()
